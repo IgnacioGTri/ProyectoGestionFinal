@@ -1,30 +1,21 @@
 import xmlrpc.client
 import csv
 
-# -----------------------------
-# CONFIGURACIÓN DE CONEXIÓN
-# -----------------------------
-url = "https://sgempresarial1.odoo.com/odoo"
+url = "https://sgempresarial1.odoo.com"
 db = "sgempresarial1"
-username = "Ignacio Trigueros"
-password = "Huarke2026"
+username = "896846@alu.murciaeduca.es"
+password = "Archenaignacio2025"
 
-# -----------------------------
-# CONEXIÓN A ODOO
-# -----------------------------
 common = xmlrpc.client.ServerProxy(f"{url}/xmlrpc/2/common")
 uid = common.authenticate(db, username, password, {})
 
 if not uid:
-    raise Exception("Error de autenticación")
+    raise Exception("Error de autenticación.")
 
 models = xmlrpc.client.ServerProxy(f"{url}/xmlrpc/2/object")
 
-print("Conectado correctamente a Odoo")
+print("✅ Conectado correctamente a Odoo Online")
 
-# -----------------------------
-# FUNCIÓN: OBTENER O CREAR CATEGORÍA
-# -----------------------------
 def get_or_create_category(category_name):
     category = models.execute_kw(
         db, uid, password,
@@ -32,7 +23,6 @@ def get_or_create_category(category_name):
         [[('name', '=', category_name)]],
         {'limit': 1}
     )
-
     if category:
         return category[0]
     else:
@@ -42,9 +32,6 @@ def get_or_create_category(category_name):
             [{'name': category_name}]
         )
 
-# -----------------------------
-# FUNCIÓN: OBTENER UBICACIÓN INTERNA
-# -----------------------------
 def get_internal_location():
     location = models.execute_kw(
         db, uid, password,
@@ -52,13 +39,12 @@ def get_internal_location():
         [[('usage', '=', 'internal')]],
         {'limit': 1}
     )
+    if not location:
+        raise Exception("No se encontró ubicación interna.")
     return location[0]
 
 location_id = get_internal_location()
 
-# -----------------------------
-# PROCESO DE IMPORTACIÓN
-# -----------------------------
 with open("catalogo_hardware.csv", newline='', encoding="utf-8") as csvfile:
     reader = csv.DictReader(csvfile)
 
@@ -71,10 +57,8 @@ with open("catalogo_hardware.csv", newline='', encoding="utf-8") as csvfile:
         categoria_nombre = row['Categoría']
         cantidad = float(row['Cantidad'])
 
-        # Obtener o crear categoría
         categoria_id = get_or_create_category(categoria_nombre)
 
-        # Verificar si el producto ya existe
         existing_product = models.execute_kw(
             db, uid, password,
             'product.product', 'search',
@@ -84,9 +68,8 @@ with open("catalogo_hardware.csv", newline='', encoding="utf-8") as csvfile:
 
         if existing_product:
             product_id = existing_product[0]
-            print(f"Producto ya existe: {nombre}")
+            print(f"🔄 Producto ya existe: {nombre}")
         else:
-            # Crear producto (tipo almacenable)
             template_id = models.execute_kw(
                 db, uid, password,
                 'product.template', 'create',
@@ -96,11 +79,10 @@ with open("catalogo_hardware.csv", newline='', encoding="utf-8") as csvfile:
                     'list_price': precio,
                     'standard_price': coste,
                     'categ_id': categoria_id,
-                    'type': 'product'
+                    'type': 'product'   # <-- CORRECCIÓN
                 }]
             )
 
-            # Obtener variante creada automáticamente
             product_variant = models.execute_kw(
                 db, uid, password,
                 'product.product', 'search',
@@ -109,21 +91,33 @@ with open("catalogo_hardware.csv", newline='', encoding="utf-8") as csvfile:
             )
 
             product_id = product_variant[0]
-            print(f"Producto creado: {nombre}")
+            print(f"🆕 Producto creado: {nombre}")
 
-        # -----------------------------
-        # AJUSTE INICIAL DE INVENTARIO
-        # -----------------------------
-        models.execute_kw(
+        quant = models.execute_kw(
             db, uid, password,
-            'stock.quant', 'create',
-            [{
-                'product_id': product_id,
-                'location_id': location_id,
-                'inventory_quantity': cantidad
-            }]
+            'stock.quant', 'search',
+            [[('product_id', '=', product_id),
+              ('location_id', '=', location_id)]],
+            {'limit': 1}
         )
 
-        print(f"Stock ajustado: {nombre} → {cantidad} unidades")
+        if quant:
+            models.execute_kw(
+                db, uid, password,
+                'stock.quant', 'write',
+                [quant, {'inventory_quantity': cantidad}]
+            )
+        else:
+            models.execute_kw(
+                db, uid, password,
+                'stock.quant', 'create',
+                [{
+                    'product_id': product_id,
+                    'location_id': location_id,
+                    'inventory_quantity': cantidad
+                }]
+            )
 
-print("Proceso completado correctamente.")
+        print(f"📦 Stock ajustado: {nombre} → {cantidad} unidades")
+
+print("🎯 Proceso completado correctamente.")
