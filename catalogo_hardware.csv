@@ -1,16 +1,9 @@
-Referencia interna,Nombre,Precio de venta,Coste,Categoría,Cantidad
-HW001,Procesador Intel Core i7-13700K,420.00,350.00,Procesadores,15
-HW002,Procesador AMD Ryzen 7 7800X,399.00,320.00,Procesadores,12
-HW003,Placa Base ASUS ROG STRIX B650,250.00,200.00,Placas Base,10
-HW004,Placa Base MSI PRO Z790-A,230.00,185.00,Placas Base,8
-HW005,Memoria RAM Corsair 16GB DDR5,95.00,70.00,Memoria RAM,30
-HW006,Memoria RAM Kingston 32GB DDR5,180.00,140.00,Memoria RAM,20
-HW007,Disco SSD Samsung 1TB NVMe,120.00,90.00,Almacenamiento,25
-HW008,Disco Duro Seagate 2TB HDD,75.00,55.00,Almacenamiento,18
-HW009,Tarjeta Gráfica NVIDIA RTX 4070,650.00,580.00,Tarjetas Gráficas,6
-HW010,Tarjeta Gráfica AMD Radeon RX 7800 XT,590.00,520.00,Tarjetas Gráficas,5
-HW011,Fuente de Alimentación 750W Corsair,110.00,85.00,Fuentes de Alimentación,14
-HW012,Tornillo,10.00,5.00,Herramientas,500
-HW013,Monitor LG 27" 144Hz,220.00,175.00,Monitores,9
-HW014,Teclado Mecánico Logitech G Pro,130.00,95.00,Periféricos,16
-HW015,Ratón Gaming Razer DeathAdder,60.00,40.00,Periféricos,22
+Producto,Precio de venta,Coste
+Booking Fees,50.0,0.0
+DUA VAT Valuation 10%,1.0,0.0
+DUA VAT Valuation 21%,1.0,0.0
+DUA VAT Valuation 4%,1.0,0.0
+Figura Orco,50.0,0.0
+Figura Pikachu,25.0,0.0
+Procesador Intel Core i7-13700K,420.0,350.0
+tornillos,1.0,0.0
